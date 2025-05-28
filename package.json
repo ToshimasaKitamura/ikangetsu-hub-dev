@@ -1,0 +1,36 @@
+{
+  "name": "ikangetsu-hub",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node copyAssets.mjs && tsc -b && vite build",
+    "start": "node copyAssets.mjs && swc src -d dist && node dist/index.js",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@types/node": "^22.15.2",
+    "csv-parse": "^5.6.0",
+    "csv-parser": "^3.2.0",
+    "fs-extra": "^11.3.0",
+    "papaparse": "^5.5.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@types/papaparse": "^5.3.15",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react-swc": "^3.8.0",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.26.1",
+    "vite": "^6.3.1"
+  }
+}

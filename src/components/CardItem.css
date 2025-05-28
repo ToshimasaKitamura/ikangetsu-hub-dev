@@ -1,0 +1,54 @@
+.card-item {
+  cursor: pointer;
+  /* border: 1px solid #ddd; */
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  /* background: white; */
+}
+
+.card-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.card-info {
+  padding: 10px;
+}
+
+.card-info h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.card-info p {
+  margin: 4px 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.card-info p.card-name {
+  color: white;
+}
+
+.card-type, .card-deck {
+  margin: 5px 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.4s;
+} 
