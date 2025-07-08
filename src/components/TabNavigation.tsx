@@ -2,8 +2,8 @@ import React from 'react';
 import './TabNavigation.css';
 
 interface TabNavigationProps {
-  activeTab: 'gallery' | 'search';
-  onTabChange: (tab: 'gallery' | 'search') => void;
+  activeTab: 'gallery' | 'search' | 'download';
+  onTabChange: (tab: 'gallery' | 'search' | 'download') => void;
 }
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange }) => {
@@ -20,6 +20,12 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
         onClick={() => onTabChange('search')}
       >
         カード検索
+      </button>
+      <button
+        className={`tab-button ${activeTab === 'download' ? 'active' : ''}`}
+        onClick={() => onTabChange('download')}
+      >
+        デッキダウンロード
       </button>
     </div>
   );

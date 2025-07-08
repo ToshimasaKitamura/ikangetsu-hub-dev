@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '../types';
-import { getCardImage } from '../utils/imageLoader';
 import './CardSearch.css';
 
 interface CardSearchProps {
@@ -33,13 +32,12 @@ function cardNumberToInt(cardNumber: string): number {
 const CardSearch: React.FC<CardSearchProps> = ({ cards, onCardSelect, illustrators, pclData, spcData, cpcData, pfcData }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDeck, setSelectedDeck] = useState<string>('all');
   const [selectedNumber, setSelectedNumber] = useState<string>('all');
   const [selectedRace, setSelectedRace] = useState<string>('all');
   const [selectedIllustrator, setSelectedIllustrator] = useState<string>('all');
   const [remakeFilter, setRemakeFilter] = useState<'all' | 'remakeOnly' | 'excludeRemake'>('all');
-  const [cardImages, setCardImages] = useState<{ [key: string]: string }>({});
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // デッキの一覧を取得
   const decks = Array.from(new Set([
@@ -57,37 +55,10 @@ const CardSearch: React.FC<CardSearchProps> = ({ cards, onCardSelect, illustrato
   // 数値の選択肢
   const numbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫'];
 
-  // カード画像の読み込み
-  useEffect(() => {
-    const loadImages = async () => {
-      const newImages: { [key: string]: string } = {};
-      for (const card of cards) {
-        if (card.promoCardId) {
-          newImages[card.promoCardId] = await getCardImage(card.promoCardId);
-        }
-        if (card.spcCardId) {
-          newImages[card.spcCardId] = await getCardImage(card.spcCardId);
-        }
-        if (card.cpcCardId) {
-          newImages[card.cpcCardId] = await getCardImage(card.cpcCardId);
-        }
-        if (card.remakeCardId) {
-          newImages[card.remakeCardId] = await getCardImage(card.remakeCardId);
-        }
-        if (card.pfcCardId) {
-          newImages[card.pfcCardId] = await getCardImage(card.pfcCardId);
-        }
-      }
-      setCardImages(newImages);
-    };
-    loadImages();
-  }, [cards]);
-
   // 検索条件をリセット
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedType('all');
-    setSelectedCategory('all');
     setSelectedDeck('all');
     setSelectedNumber('all');
     setSelectedRace('all');
@@ -194,72 +165,80 @@ const CardSearch: React.FC<CardSearchProps> = ({ cards, onCardSelect, illustrato
           <button onClick={resetFilters} className="reset-button">
             検索条件をリセット
           </button>
+          <button 
+            onClick={() => setShowFilters(!showFilters)} 
+            className={`filter-toggle-button ${showFilters ? 'on' : ''}`}
+          >
+            フィルター検索：{showFilters ? 'ON' : 'OFF'}
+          </button>
           <span style={{ marginLeft: '16px', fontWeight: 500, fontSize: '1rem', color: '#fafafa' }}>
             {filteredCards.length}件ヒットしました
           </span>
         </div>
-        <div className="filter-row">
-          <select
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">全てのスペル</option>
-            <option value="攻撃スペル">攻撃スペル</option>
-            <option value="回避スペル">回避スペル</option>
-            <option value="スペルなし">スペルなし</option>
-            <option value="特殊能力">特殊能力</option>
-          </select>
-          <select
-            value={selectedDeck}
-            onChange={(e) => setSelectedDeck(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">全てのデッキ</option>
-            {decks.map(deck => (
-              <option key={deck} value={deck}>{deck}</option>
-            ))}
-          </select>
-          <select
-            value={remakeFilter}
-            onChange={e => setRemakeFilter(e.target.value as 'all' | 'remakeOnly' | 'excludeRemake')}
-            className="filter-select"
-          >
-            <option value="all">Remake指定なし</option>
-            <option value="remakeOnly">Remakeのみ</option>
-            <option value="excludeRemake">Remakeを含まない</option>
-          </select>
-          <select
-            value={selectedNumber}
-            onChange={(e) => setSelectedNumber(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">全ての数値</option>
-            {numbers.map(num => (
-              <option key={num} value={num}>{num}</option>
-            ))}
-          </select>
-          <select
-            value={selectedRace}
-            onChange={(e) => setSelectedRace(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">全ての種族</option>
-            {races.map(race => (
-              <option key={race} value={race}>{race}</option>
-            ))}
-          </select>
-          <select
-            value={selectedIllustrator}
-            onChange={(e) => setSelectedIllustrator(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">全てのイラストレーター</option>
-            {illustratorNames.map(name => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-        </div>
+        {showFilters && (
+          <div className="filter-row">
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">全てのスペル</option>
+              <option value="攻撃スペル">攻撃スペル</option>
+              <option value="回避スペル">回避スペル</option>
+              <option value="スペルなし">スペルなし</option>
+              <option value="特殊能力">特殊能力</option>
+            </select>
+            <select
+              value={selectedDeck}
+              onChange={(e) => setSelectedDeck(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">全てのデッキ</option>
+              {decks.map(deck => (
+                <option key={deck} value={deck}>{deck}</option>
+              ))}
+            </select>
+            <select
+              value={remakeFilter}
+              onChange={e => setRemakeFilter(e.target.value as 'all' | 'remakeOnly' | 'excludeRemake')}
+              className="filter-select"
+            >
+              <option value="all">Remake指定なし</option>
+              <option value="remakeOnly">Remakeのみ</option>
+              <option value="excludeRemake">Remakeを含まない</option>
+            </select>
+            <select
+              value={selectedNumber}
+              onChange={(e) => setSelectedNumber(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">全ての数値</option>
+              {numbers.map(num => (
+                <option key={num} value={num}>{num}</option>
+              ))}
+            </select>
+            <select
+              value={selectedRace}
+              onChange={(e) => setSelectedRace(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">全ての種族</option>
+              {races.map(race => (
+                <option key={race} value={race}>{race}</option>
+              ))}
+            </select>
+            <select
+              value={selectedIllustrator}
+              onChange={(e) => setSelectedIllustrator(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">全てのイラストレーター</option>
+              {illustratorNames.map(name => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
       <div className="search-results">
         {sortedCards.map(card => {

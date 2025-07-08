@@ -30,12 +30,13 @@
 
 .card-info p {
   margin: 4px 0;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #666;
 }
 
 .card-info p.card-name {
   color: white;
+  font-size: 0.85rem;
 }
 
 .card-type, .card-deck {

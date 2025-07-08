@@ -19,7 +19,7 @@ export interface IllustratorData {
 }
 
 export function readIrlCsv(): Promise<IllustratorData[]> {
-  const csvPath = '/db/IRL.csv';
+  const csvPath = import.meta.env.BASE_URL + '/db/IRL.csv';
   return fetch(csvPath)
     .then(response => response.text())
     .then(csvText => {
@@ -42,7 +42,7 @@ export function readIrlCsv(): Promise<IllustratorData[]> {
 }
 
 export function readNclCsv(): Promise<CardData[]> {
-  const csvPath = '/db/NCL.csv';
+  const csvPath = import.meta.env.BASE_URL + '/db/NCL.csv';
   return fetch(csvPath)
     .then(response => {
       return response.text();
@@ -78,7 +78,7 @@ export function readNclCsv(): Promise<CardData[]> {
 }
 
 export function readRclCsv(): Promise<{ id: string; normal_card_id: string }[]> {
-  const csvPath = '/db/RCL.csv';
+  const csvPath = import.meta.env.BASE_URL + '/db/RCL.csv';
   return fetch(csvPath)
     .then(response => response.text())
     .then(csvText => {
@@ -101,7 +101,7 @@ export function readRclCsv(): Promise<{ id: string; normal_card_id: string }[]> 
 }
 
 export function readPclCsv(): Promise<{ id: string; card_name: string; characters: string; illustrator_id: string; normal_card_id: string }[]> {
-  const csvPath = '/db/PCL.csv';
+  const csvPath = import.meta.env.BASE_URL + '/db/PCL.csv';
   return fetch(csvPath)
     .then(response => response.text())
     .then(csvText => {
@@ -127,7 +127,7 @@ export function readPclCsv(): Promise<{ id: string; card_name: string; character
 }
 
 export async function readSpcCsv(): Promise<{ id: string; card_name: string; characters: string; illustrator_id: string; normal_card_id: string }[]> {
-  const csvPath = '/db/SPC.csv';
+  const csvPath = import.meta.env.BASE_URL + '/db/SPC.csv';
   return fetch(csvPath)
     .then(response => response.text())
     .then(csvText => {
@@ -153,7 +153,7 @@ export async function readSpcCsv(): Promise<{ id: string; card_name: string; cha
 }
 
 export async function readCpcCsv(): Promise<{ id: string; card_name: string; characters: string; normal_card_id: string; illustrator_id: string }[]> {
-  const csvPath = '/db/CPC.csv';
+  const csvPath = import.meta.env.BASE_URL + '/db/CPC.csv';
   return fetch(csvPath)
     .then(response => response.text())
     .then(csvText => {
@@ -179,7 +179,7 @@ export async function readCpcCsv(): Promise<{ id: string; card_name: string; cha
 }
 
 export async function readPfcCsv(): Promise<{ id: string; card_name: string; characters: string; normal_card_id: string; illustrator_id: string }[]> {
-  const csvPath = '/db/PFC.csv';
+  const csvPath = import.meta.env.BASE_URL + '/db/PFC.csv';
   return fetch(csvPath)
     .then(response => response.text())
     .then(csvText => {
@@ -206,7 +206,7 @@ export async function readPfcCsv(): Promise<{ id: string; card_name: string; cha
 
 export const readSclCsv = async (): Promise<{ id: string; card_name: string; characters: string; normal_card_id: string }[]> => {
   try {
-    const response = await fetch('/data/scl.csv');
+    const response = await fetch(import.meta.env.BASE_URL + '/data/scl.csv');
     const csvText = await response.text();
     const rows = csvText.split('\n').slice(1); // ヘッダー行をスキップ
     return rows

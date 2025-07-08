@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
-import CardList from './components/CardList'
-import CardDetail from './components/CardDetail'
+import CardList from './components/CardList/CardList'
+import CardDetail from './components/CardDetail/CardDetail'
 import TabNavigation from './components/TabNavigation'
 import CardSearch from './components/CardSearch'
+import DownloadTab from './components/DownloadTab/DownloadTab'
 import { readNclCsv, readIrlCsv, readRclCsv, readPclCsv, readSpcCsv, readCpcCsv, readPfcCsv, readSclCsv } from './utils/csvReader'
 import { getCardImage } from './utils/imageLoader'
 import './App.css'
 import { Card } from './types'
-import DeckSidebar from './components/DeckSidebar'
 
 const groupCardsByDeck = (cards: Card[]) => {
   const grouped: { [key: string]: Card[] } = {};
@@ -20,11 +20,18 @@ const groupCardsByDeck = (cards: Card[]) => {
   return grouped;
 };
 
+const VARIATION_DECKS = [
+  'プロモ',
+  'スペシャルプロモ',
+  'コレクションプリズム',
+  'pixivFANBOX'
+];
+
 const App: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([])
   const [searchCards, setSearchCards] = useState<Card[]>([])
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
-  const [activeTab, setActiveTab] = useState<'gallery' | 'search'>('gallery')
+  const [activeTab, setActiveTab] = useState<'gallery' | 'search' | 'download'>('gallery')
   const [testImages, setTestImages] = useState<Card[]>([])
   const [rclData, setRclData] = useState<{ id: string; normal_card_id: string }[]>([])
   const [pclData, setPclData] = useState<{ id: string; card_name: string; characters: string; illustrator_id: string; normal_card_id: string }[]>([]);
@@ -37,11 +44,17 @@ const App: React.FC = () => {
   const deckRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const groupedCards = groupCardsByDeck(cards)
+  const deckList = [
+    ...Object.keys(groupedCards),
+    ...VARIATION_DECKS
+  ];
+  const navDeckList = Object.keys(groupedCards);
 
   useEffect(() => {
     const loadCards = async () => {
       try {
         const csvData = await readNclCsv()
+        console.log('NCL.csvの中身:', csvData)
         const illustrators = await readIrlCsv()
         const rclEntries = await readRclCsv()
         const pclEntries = await readPclCsv()
@@ -57,6 +70,8 @@ const App: React.FC = () => {
         setPfcData(pfcEntries)
         setSclData(sclEntries)
         
+        
+
         const cardData: Card[] = []
         const searchCardData: Card[] = []
         for (const card of csvData) {
@@ -260,14 +275,58 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeTab, groupedCards]);
 
+  // タブ切り替え時にカード詳細画面を閉じる
+  useEffect(() => {
+    setSelectedCard(null);
+  }, [activeTab]);
+
   return (
     <div className="app">
-      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* フッター：ギャラリー画面のときだけ表示 */}
+      {activeTab === 'gallery' && (
+        <footer className="app-footer">
+          <select
+            className="deck-select"
+            value={activeDeckName}
+            onChange={e => {
+              const deck = e.target.value;
+              const el = deckRefs.current[deck];
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            style={{ fontSize: '1.1em', padding: '8px 16px', borderRadius: 8, border: '1.5px solid #bbb', background: '#222', color: '#fff', minWidth: 120 }}
+          >
+            {navDeckList.map(deck => (
+              <option key={deck} value={deck}>{deck}</option>
+            ))}
+          </select>
+        </footer>
+      )}
+      {selectedCard && <div className="modal-bg-blur" />}
+      {selectedCard && (
+        <CardDetail
+          card={selectedCard}
+          onClose={() => setSelectedCard(null)}
+          pclData={pclData}
+          illustrators={illustrators}
+          cpcData={cpcData.map(cpc => ({ ...cpc, illustrator_id: '' }))}
+        />
+      )}
+      <div className="sub-header">
+        <div className="ikangetsu-hub-logo-center">ー 東方如何月HUB ー</div>
+      </div>
+      <header className="app-header">
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      </header>
       {activeTab === 'gallery' ? (
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-          <DeckSidebar deckNames={Object.keys(groupedCards)} activeDeckName={activeDeckName} />
-          <div style={{ flex: 1, filter: selectedCard ? 'blur(5px)' : 'none', padding: '0 16px' }}>
-            {!selectedCard && <h1>東方如何月カードギャラリー</h1>}
+          <div
+            style={{
+              flex: 1,
+              filter: selectedCard ? 'blur(5px)' : 'none',
+              padding: typeof window !== 'undefined' && window.innerWidth <= 600 ? '0 1px' : '0 16px',
+              transition: 'padding-left 0.35s cubic-bezier(.4,1.2,.4,1)',
+            }}
+          >
             <div>
               {Object.entries(groupedCards).map(([deckName, deckCards]) => (
                 <div
@@ -276,7 +335,6 @@ const App: React.FC = () => {
                   ref={el => { deckRefs.current[deckName] = el; }}
                   style={{ marginBottom: '20px' }}
                 >
-                  <h2>{deckName}</h2>
                   <CardList
                     cards={deckCards}
                     onCardSelect={(card) => setSelectedCard({
@@ -290,7 +348,7 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'search' ? (
         <CardSearch
           cards={searchCards}
           illustrators={illustrators}
@@ -304,15 +362,8 @@ const App: React.FC = () => {
             deck_name: card.deck_name || ''
           })}
         />
-      )}
-      {selectedCard && (
-        <CardDetail
-          card={selectedCard}
-          onClose={() => setSelectedCard(null)}
-          pclData={pclData}
-          illustrators={illustrators}
-          cpcData={cpcData.map(cpc => ({ ...cpc, illustrator_id: '' }))}
-        />
+      ) : (
+        <DownloadTab cards={searchCards} decks={deckList} />
       )}
     </div>
   )

@@ -12,7 +12,7 @@ export async function getCardImage(id: string): Promise<string> {
   } else if (id.startsWith('5')) {
     folderPrefix = '5xxx';
   }
-  const imagePath = `/cards/${folderPrefix}/${id}.png`;
+  const imagePath = import.meta.env.BASE_URL + `cards/${folderPrefix}/${id}.png`;
   
   // 画像パスを直接返す（存在確認はしない）
   return imagePath;

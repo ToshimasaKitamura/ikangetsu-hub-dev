@@ -1,5 +1,6 @@
 .card-search {
   padding: 20px;
+  margin-top: 80px;
 }
 
 .search-filters {
@@ -24,6 +25,8 @@
   border-radius: 4px;
   font-size: 16px;
   min-width: 200px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .reset-button {
@@ -41,6 +44,33 @@
 .reset-button:hover {
   background-color: #f5f5f5;
   border-color: #000;
+}
+
+.filter-toggle-button {
+  padding: 8px 16px;
+  background-color: #e74c3c;
+  border: 1px solid #e74c3c;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+  margin-left: 10px;
+}
+
+.filter-toggle-button:hover {
+  background-color: #c0392b;
+  border-color: #c0392b;
+}
+
+.filter-toggle-button.on {
+  background-color: #4a90e2;
+  border-color: #4a90e2;
+}
+
+.filter-toggle-button.on:hover {
+  background-color: #357abd;
+  border-color: #357abd;
 }
 
 .filter-row {
@@ -96,4 +126,83 @@
   margin: 4px 0;
   font-size: 14px;
   color: #666;
+}
+
+/* スマホ版の調整 */
+@media (max-width: 767px) {
+  .card-search {
+    padding: 10px;
+    margin-top: 80px;
+  }
+  
+  .search-filters {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .search-input {
+    font-size: 14px;
+    padding: 6px;
+    min-width: auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .reset-button,
+  .filter-toggle-button {
+    font-size: 14px;
+    padding: 6px 12px;
+    margin-left: 0;
+  }
+  
+  .filter-toggle-button {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+  }
+  
+  .filter-toggle-button:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+  }
+  
+  .filter-toggle-button.on {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+  }
+  
+  .filter-toggle-button.on:hover {
+    background-color: #357abd;
+    border-color: #357abd;
+  }
+  
+  .filter-row {
+    gap: 6px;
+  }
+  
+  .filter-select {
+    font-size: 14px;
+    padding: 6px;
+    min-width: 120px;
+  }
+  
+  .search-results {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .search-card-info h3 {
+    font-size: 14px;
+  }
+  
+  .search-card-info p {
+    font-size: 12px;
+  }
 } 

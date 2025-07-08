@@ -6,22 +6,26 @@ interface CardItemProps {
   card: Card;
   normalImage: string;
   remakeImage: string | null;
+  showRemake?: boolean;
   onClick: () => void;
 }
 
-const CardItem: React.FC<CardItemProps> = ({ card, normalImage, remakeImage, onClick }) => {
-  const [showRemake, setShowRemake] = useState(false);
+const CardItem: React.FC<CardItemProps> = ({ card, normalImage, remakeImage, showRemake: externalShowRemake, onClick }) => {
+  const [internalShowRemake, setInternalShowRemake] = useState(false);
   const [fade, setFade] = useState<'in' | 'out'>('in');
 
-  // 画像切り替えロジック
+  // 外部制御がある場合はそれを使用、ない場合は内部制御
+  const showRemake = externalShowRemake !== undefined ? externalShowRemake : internalShowRemake;
+
+  // 画像切り替えロジック（外部制御がない場合のみ）
   useEffect(() => {
-    if (!remakeImage) return;
+    if (!remakeImage || externalShowRemake !== undefined) return;
     let timeout: NodeJS.Timeout;
     let fadeTimeout: NodeJS.Timeout;
     const switchImage = () => {
       setFade('out');
       fadeTimeout = setTimeout(() => {
-        setShowRemake((prev) => !prev);
+        setInternalShowRemake((prev) => !prev);
         setFade('in');
       }, 400);
       timeout = setTimeout(switchImage, Math.random() * 5000 + 5000);
@@ -31,7 +35,7 @@ const CardItem: React.FC<CardItemProps> = ({ card, normalImage, remakeImage, onC
       clearTimeout(timeout);
       clearTimeout(fadeTimeout);
     };
-  }, [remakeImage]);
+  }, [remakeImage, externalShowRemake]);
 
   // 表示する画像
   const imageUrl = showRemake && remakeImage ? remakeImage : normalImage;
@@ -43,9 +47,9 @@ const CardItem: React.FC<CardItemProps> = ({ card, normalImage, remakeImage, onC
         alt={card.name}
         className={`fade-${fade}`}
       />
-      <div className="card-info">
+      {/* <div className="card-info">
         <p className="card-name">{card.name}</p>
-      </div>
+      </div> */}
     </div>
   );
 };

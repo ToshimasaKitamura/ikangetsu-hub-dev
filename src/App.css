@@ -1,3 +1,10 @@
+html, body, #root, .app {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  width: 100vw;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -44,6 +51,8 @@
 .app {
   text-align: center;
   padding: 20px;
+  padding-top: 20px !important;
+  padding-bottom: 72px;
 }
 
 .test-image-container {
@@ -82,3 +91,242 @@
   font-size: 0.9em;
   word-break: break-all;
 }
+
+@media (max-width: 600px) {
+  .app {
+    flex-direction: column !important;
+    padding: 0 !important;
+  }
+  .card-info h3,
+  .card-info p {
+    font-size: 1rem !important;
+  }
+  .search-filters,
+  .filter-row,
+  .search-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .search-input,
+  .filter-select,
+  .reset-button {
+    width: 100% !important;
+    font-size: 1rem !important;
+  }
+  .deck-sidebar {
+    width: 100vw !important;
+    position: static !important;
+    margin-bottom: 16px !important;
+  }
+  /* 必要に応じて他の要素も追加！ */
+}
+
+/* ヘッダー */
+.app-header {
+  position: fixed;
+  top: 36px;
+  left: 0;
+  width: 100vw;
+  background: rgba(30,30,30,0.85);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 72px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding-top: 8px;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
+/* メインコンテンツの上余白調整 */
+.app {
+  padding-top: 56px;
+  padding-bottom: 72px;
+}
+
+/* フッター */
+.app-footer {
+  width: 100vw;
+  background: rgba(30,30,30,0.92);
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 56px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+}
+
+.deck-slider {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  position: relative;
+  width: 100vw;
+  justify-content: center;
+  overflow-x: auto;
+  padding: 0 12px;
+}
+.slider-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: #bbb;
+  z-index: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.deck-dot-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 24px;
+}
+.deck-popup {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.95);
+  color: #fff;
+  font-size: 0.95em;
+  padding: 4px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.18s;
+  z-index: 10;
+}
+.deck-dot {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.deck-dot .dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #bbb;
+  transition: background 0.2s, transform 0.2s;
+  display: block;
+  z-index: 2;
+}
+.deck-dot.active .dot {
+  background: #fff;
+  transform: scale(1.25);
+  box-shadow: 0 0 6px #fff;
+}
+@media (max-width: 767px) {
+  .deck-slider {
+    gap: 6px;
+    padding: 0 4px;
+  }
+  .slider-line {
+    height: 1.5px;
+  }
+  .deck-dot-wrapper {
+    min-width: 16px;
+  }
+  .deck-dot .dot {
+    width: 8px;
+    height: 8px;
+  }
+  .deck-popup {
+    font-size: 0.85em;
+    padding: 2px 8px;
+    bottom: 18px;
+  }
+  .app {
+    padding-top: 32px !important;
+    padding-bottom: 72px;
+  }
+  .card-list,
+  .card-search-root {
+    margin-top: 0 !important;
+  }
+  .download-tab {
+    margin-top: 24px !important;
+  }
+}
+
+.card-list,
+.card-search-root {
+  margin-top: 0;
+}
+
+/* ダウンロード画面だけはmargin-topを維持 */
+.download-tab {
+  margin-top: 24px !important;
+}
+
+.modal-bg-blur {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+.ikangetsu-hub-logo {
+  position: absolute;
+  top: 12px;
+  right: 24px;
+  font-family: 'DotGothic16', sans-serif;
+  font-size: 1.3rem;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+  z-index: 200;
+  user-select: none;
+  pointer-events: none;
+}
+
+.sub-header {
+  width: 100vw;
+  height: 36px;
+  background: rgba(30,30,30,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+}
+
+.ikangetsu-hub-logo-center {
+  font-family: 'DotGothic16', sans-serif;
+  font-size: 1.18rem;
+  color: #fff;
+  letter-spacing: 0.35em;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.35), 0 1px 0 #fff, 0 2px 4px rgba(0,0,0,0.18);
+  user-select: none;
+  pointer-events: none;
+  text-transform: uppercase;
+  padding: 0 0;
+  font-weight: 700;
+}
+
