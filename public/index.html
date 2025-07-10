@@ -4,7 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ikangetsu-hub</title>
-    <!-- 他のhead要素 -->
+    <style>
+      /* 初期読み込み時の白背景を防ぐ */
+      html, body {
+        background-color: #242424 !important;
+        background-image: linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+                          linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px) !important;
+        background-size: 20px 20px !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
+        color: rgba(255, 255, 255, 0.87) !important;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
