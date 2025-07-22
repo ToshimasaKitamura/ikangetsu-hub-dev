@@ -20,7 +20,7 @@ const NoteArticles: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showOnlyIkangetsu, setShowOnlyIkangetsu] = useState(true);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [authorFilter, setAuthorFilter] = useState<string>('');
+  const [authorFilter, setAuthorFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchNoteArticles();
@@ -103,14 +103,10 @@ const NoteArticles: React.FC = () => {
     : articles;
 
   // 作者でフィルタリング
-  if (authorFilter.trim()) {
-    filteredArticles = filteredArticles.filter(article => {
-      const searchTerm = authorFilter.toLowerCase();
-      return (
-        (article.creatorName && article.creatorName.toLowerCase().includes(searchTerm)) ||
-        article.creator.toLowerCase().includes(searchTerm)
-      );
-    });
+  if (authorFilter && authorFilter !== 'all') {
+    filteredArticles = filteredArticles.filter(article => 
+      article.creator === authorFilter
+    );
   }
 
   // 日付でソート
@@ -126,6 +122,17 @@ const NoteArticles: React.FC = () => {
   });
 
 
+  // ユニークな作者リストを取得
+  const uniqueAuthors = Array.from(new Set(
+    articles.map(article => article.creator)
+  )).sort().map(creator => {
+    const article = articles.find(a => a.creator === creator);
+    return {
+      creator,
+      displayName: article?.creatorName || creator
+    };
+  });
+
   return (
     <div className="note-articles">
       <div className="note-header">
@@ -139,24 +146,20 @@ const NoteArticles: React.FC = () => {
             />
             <span>「東方如何月」タグのみ表示</span>
           </label>
-          <div className="author-search">
-            <label>作者検索：</label>
-            <input
-              type="text"
-              value={authorFilter}
+          <div className="author-filter">
+            <label>作者：</label>
+            <select 
+              value={authorFilter} 
               onChange={(e) => setAuthorFilter(e.target.value)}
-              placeholder="作者名で検索..."
-              className="author-input"
-            />
-            {authorFilter && (
-              <button 
-                onClick={() => setAuthorFilter('')}
-                className="clear-search"
-                title="検索をクリア"
-              >
-                ×
-              </button>
-            )}
+              className="author-select"
+            >
+              <option value="all">すべての作者</option>
+              {uniqueAuthors.map((author) => (
+                <option key={author.creator} value={author.creator}>
+                  {author.displayName} ({author.creator})
+                </option>
+              ))}
+            </select>
           </div>
           <div className="sort-controls">
             <label>並び順：</label>
@@ -189,8 +192,8 @@ const NoteArticles: React.FC = () => {
 
       {!loading && !error && sortedArticles.length === 0 && (
         <div className="no-articles">
-          {authorFilter.trim() 
-            ? `「${authorFilter}」に一致する作者の記事が見つかりませんでした。`
+          {authorFilter !== 'all'
+            ? `選択した作者の記事が見つかりませんでした。`
             : showOnlyIkangetsu && articles.length > 0
             ? '「東方如何月」タグを含む記事が見つかりませんでした。'
             : '記事が見つかりませんでした。'}
