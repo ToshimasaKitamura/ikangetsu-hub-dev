@@ -23,12 +23,12 @@ jobs:
       
       - name: Install dependencies
         run: |
-          npm install node-fetch xml2js
+          npm install node-fetch
       
-      - name: Fetch Note RSS
+      - name: Fetch Note Articles via API
         run: |
-          # ユーザーリストから「東方如何月」記事を取得
-          node scripts/fetchNoteRss.mjs 東方如何月
+          # Note非公式APIから「東方如何月」記事を取得（最大50件）
+          node scripts/fetchNoteRss.mjs 東方如何月 50
       
       - name: Check if file changed
         id: check_changes
