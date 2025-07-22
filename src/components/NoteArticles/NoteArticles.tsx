@@ -6,9 +6,12 @@ interface NoteArticle {
   link: string;
   pubDate: string;
   creator: string;
+  creatorName?: string;
   thumbnail?: string;
   description: string;
   categories: string[];
+  likeCount?: number;
+  commentCount?: number;
 }
 
 const NoteArticles: React.FC = () => {
@@ -154,10 +157,30 @@ const NoteArticles: React.FC = () => {
               <div className="article-info">
                 <h3>{article.title}</h3>
                 <div className="article-meta">
-                  <span className="article-date">
-                    {new Date(article.pubDate).toLocaleDateString('ja-JP')}
-                  </span>
-                  <span className="article-creator">@{article.creator}</span>
+                  <div className="meta-line">
+                    <span className="article-date">
+                      📅 {new Date(article.pubDate).toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  <div className="meta-line">
+                    <span className="article-creator">
+                      ✍️ {article.creatorName || article.creator} (@{article.creator})
+                    </span>
+                  </div>
+                  {(article.likeCount !== undefined || article.commentCount !== undefined) && (
+                    <div className="meta-line stats">
+                      {article.likeCount !== undefined && (
+                        <span className="like-count">❤️ {article.likeCount}</span>
+                      )}
+                      {article.commentCount !== undefined && (
+                        <span className="comment-count">💬 {article.commentCount}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <p className="article-description">
                   {article.description}

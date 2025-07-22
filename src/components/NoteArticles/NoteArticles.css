@@ -216,11 +216,44 @@
 }
 
 .article-meta {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   font-size: 14px;
+}
+
+.meta-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
   color: #888;
+}
+
+.meta-line:last-child {
+  margin-bottom: 0;
+}
+
+.meta-line.stats {
+  gap: 16px;
+  color: #999;
+}
+
+.article-date,
+.article-creator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.article-creator {
+  color: #aaa;
+  font-weight: 500;
+}
+
+.like-count,
+.comment-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
 }
 
 .article-description {
