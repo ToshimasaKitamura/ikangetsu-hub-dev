@@ -19,6 +19,7 @@ const NoteArticles: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showOnlyIkangetsu, setShowOnlyIkangetsu] = useState(true);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
   useEffect(() => {
     fetchNoteArticles();
@@ -100,6 +101,18 @@ const NoteArticles: React.FC = () => {
       )
     : articles;
 
+  // 日付でソート
+  const sortedArticles = [...filteredArticles].sort((a, b) => {
+    const dateA = new Date(a.pubDate);
+    const dateB = new Date(b.pubDate);
+    
+    if (sortOrder === 'newest') {
+      return dateB.getTime() - dateA.getTime();
+    } else {
+      return dateA.getTime() - dateB.getTime();
+    }
+  });
+
   return (
     <div className="note-articles">
       <div className="note-header">
@@ -113,6 +126,17 @@ const NoteArticles: React.FC = () => {
             />
             <span>「東方如何月」タグのみ表示</span>
           </label>
+          <div className="sort-controls">
+            <label>並び順：</label>
+            <select 
+              value={sortOrder} 
+              onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest')}
+              className="sort-select"
+            >
+              <option value="newest">新しい順</option>
+              <option value="oldest">古い順</option>
+            </select>
+          </div>
           <button onClick={() => fetchNoteArticles()} className="refresh-button">
             更新
           </button>
@@ -131,7 +155,7 @@ const NoteArticles: React.FC = () => {
         </div>
       )}
 
-      {!loading && !error && filteredArticles.length === 0 && (
+      {!loading && !error && sortedArticles.length === 0 && (
         <div className="no-articles">
           {showOnlyIkangetsu && articles.length > 0
             ? '「東方如何月」タグを含む記事が見つかりませんでした。'
@@ -139,9 +163,9 @@ const NoteArticles: React.FC = () => {
         </div>
       )}
 
-      {!loading && !error && filteredArticles.length > 0 && (
+      {!loading && !error && sortedArticles.length > 0 && (
         <div className="articles-grid">
-          {filteredArticles.map((article, index) => (
+          {sortedArticles.map((article, index) => (
             <a
               key={index}
               href={article.link}
@@ -171,16 +195,6 @@ const NoteArticles: React.FC = () => {
                       ✍️ {article.creatorName || article.creator} (@{article.creator})
                     </span>
                   </div>
-                  {(article.likeCount !== undefined || article.commentCount !== undefined) && (
-                    <div className="meta-line stats">
-                      {article.likeCount !== undefined && (
-                        <span className="like-count">❤️ {article.likeCount}</span>
-                      )}
-                      {article.commentCount !== undefined && (
-                        <span className="comment-count">💬 {article.commentCount}</span>
-                      )}
-                    </div>
-                  )}
                 </div>
                 <p className="article-description">
                   {article.description}
