@@ -1,0 +1,13 @@
+# 東方如何月関連のNoteユーザー一覧
+# 1行につき1ユーザー名を記載してください
+# #で始まる行はコメントとして無視されます
+
+# 公式アカウント
+ikangetsu_official
+
+# 大会関係者
+tournament_organizer
+
+# プレイヤー・コミュニティ
+player_example
+community_member

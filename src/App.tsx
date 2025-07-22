@@ -4,18 +4,21 @@ import CardDetail from './components/CardDetail/CardDetail'
 import TabNavigation from './components/TabNavigation'
 import CardSearch from './components/CardSearch'
 import DownloadTab from './components/DownloadTab/DownloadTab'
-import { readNclCsv, readIrlCsv, readRclCsv, readPclCsv, readSpcCsv, readCpcCsv, readPfcCsv, readSclCsv } from './utils/csvReader'
+import NoteArticles from './components/NoteArticles/NoteArticles'
+import { readNclCsv, readIrlCsv, readRclCsv, readPclCsv, readSpcCsv, readCpcCsv, readPfcCsv, readSclCsv, readDplCsv, DeckData } from './utils/csvReader'
 import { getCardImage } from './utils/imageLoader'
 import './App.css'
 import { Card } from './types'
 
-const groupCardsByDeck = (cards: Card[]) => {
+const groupCardsByDeck = (cards: Card[], decks: DeckData[]) => {
   const grouped: { [key: string]: Card[] } = {};
   cards.forEach(card => {
-    if (!grouped[card.deck]) {
-      grouped[card.deck] = [];
+    const deck = decks.find(d => d.id === card.deck_id);
+    const deckName = deck ? deck.deck_name : card.deck_id;
+    if (!grouped[deckName]) {
+      grouped[deckName] = [];
     }
-    grouped[card.deck].push(card);
+    grouped[deckName].push(card);
   });
   return grouped;
 };
@@ -31,7 +34,7 @@ const App: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([])
   const [searchCards, setSearchCards] = useState<Card[]>([])
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
-  const [activeTab, setActiveTab] = useState<'gallery' | 'search' | 'download'>('gallery')
+  const [activeTab, setActiveTab] = useState<'gallery' | 'search' | 'download' | 'note'>('gallery')
   const [testImages, setTestImages] = useState<Card[]>([])
   const [rclData, setRclData] = useState<{ id: string; normal_card_id: string }[]>([])
   const [pclData, setPclData] = useState<{ id: string; card_name: string; characters: string; illustrator_id: string; normal_card_id: string }[]>([]);
@@ -40,10 +43,11 @@ const App: React.FC = () => {
   const [cpcData, setCpcData] = useState<{ id: string; card_name: string; characters: string; normal_card_id: string }[]>([])
   const [pfcData, setPfcData] = useState<{ id: string; card_name: string; characters: string; normal_card_id: string }[]>([])
   const [sclData, setSclData] = useState<{ id: string; card_name: string; characters: string; normal_card_id: string }[]>([])
+  const [deckData, setDeckData] = useState<DeckData[]>([])
   const [activeDeckName, setActiveDeckName] = useState<string>('');
   const deckRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  const groupedCards = groupCardsByDeck(cards)
+  const groupedCards = groupCardsByDeck(cards, deckData)
   const deckList = [
     ...Object.keys(groupedCards),
     ...VARIATION_DECKS
@@ -62,6 +66,7 @@ const App: React.FC = () => {
         const cpcEntries = await readCpcCsv()
         const pfcEntries = await readPfcCsv()
         const sclEntries = await readSclCsv()
+        const deckEntries = await readDplCsv()
         setPclData(pclEntries)
         setRclData(rclEntries)
         setIllustrators(illustrators)
@@ -69,6 +74,7 @@ const App: React.FC = () => {
         setCpcData(cpcEntries)
         setPfcData(pfcEntries)
         setSclData(sclEntries)
+        setDeckData(deckEntries)
         
         
 
@@ -86,18 +92,20 @@ const App: React.FC = () => {
           const cpcCard = cpcEntries.find(entry => entry.normal_card_id === card.id)
           const pfcCard = pfcEntries.find(entry => entry.normal_card_id === card.id)
           const sclCard = sclEntries.find(entry => entry.normal_card_id === card.id)
+          const deckInfo = deckEntries.find(deck => deck.id === card.deck_id)
           const newCard: Card = {
             id: card.id,
             name: card.card_name,
             image: imageUrl,
             type: card.spell_type,
-            deck: card.deck_name,
+            deck: deckInfo ? deckInfo.deck_name : card.deck_id,
             description: card.card_text,
             characters: card.characters,
             cardNumber: card.card_number,
             race: card.race,
             illustratorName: illustrator ? illustrator.name : '不明',
-            deck_name: card.deck_name || '',
+            deck_id: card.deck_id,
+            deck_name: deckInfo ? deckInfo.deck_name : card.deck_id,
             remakeCardId: remakeCard ? remakeCard.id : null,
             promoCardId: promoCard ? promoCard.id : null,
             spcCardId: spcCard ? spcCard.id : null,
@@ -169,13 +177,14 @@ const App: React.FC = () => {
               name: cpcCard.card_name,
               image: cpcImage,
               type: card.spell_type,
-              deck: card.deck_name,
+              deck: deckInfo ? deckInfo.deck_name : card.deck_id,
               description: card.card_text,
               characters: cpcCard.characters,
               cardNumber: card.card_number,
               race: card.race,
               illustratorName: cpcIllustrator ? cpcIllustrator.name : (illustrator ? illustrator.name : '不明'),
-              deck_name: card.deck_name || '',
+              deck_id: card.deck_id,
+              deck_name: deckInfo ? deckInfo.deck_name : card.deck_id,
               nclCardId: card.id,
               remakeCardId: null,
               promoCardId: null,
@@ -362,9 +371,11 @@ const App: React.FC = () => {
             deck_name: card.deck_name || ''
           })}
         />
-      ) : (
-        <DownloadTab cards={searchCards} decks={deckList} />
-      )}
+      ) : activeTab === 'download' ? (
+        <DownloadTab cards={searchCards} decks={deckList} deckData={deckData} />
+      ) : activeTab === 'note' ? (
+        <NoteArticles />
+      ) : null}
     </div>
   )
 }
