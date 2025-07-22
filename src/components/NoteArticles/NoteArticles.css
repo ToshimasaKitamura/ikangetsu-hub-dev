@@ -176,6 +176,69 @@
   border-color: #777;
 }
 
+.author-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ccc;
+  font-size: 14px;
+  position: relative;
+}
+
+.author-search label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.author-input {
+  padding: 6px 32px 6px 12px;
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  width: 180px;
+}
+
+.author-input:hover {
+  background: #444;
+  border-color: #666;
+}
+
+.author-input:focus {
+  border-color: #777;
+  background: #3a3a3a;
+}
+
+.author-input::placeholder {
+  color: #888;
+}
+
+.clear-search {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.clear-search:hover {
+  color: #fff;
+  background: #555;
+}
+
 .refresh-button,
 .reset-button {
   padding: 8px 16px;
@@ -340,7 +403,23 @@
 
   .note-controls {
     width: 100%;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .author-search {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .author-input {
+    width: 100%;
+  }
+
+  .sort-controls {
+    justify-content: flex-start;
   }
 
   .articles-grid {

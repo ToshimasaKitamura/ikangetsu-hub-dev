@@ -20,6 +20,7 @@ const NoteArticles: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showOnlyIkangetsu, setShowOnlyIkangetsu] = useState(true);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [authorFilter, setAuthorFilter] = useState<string>('');
 
   useEffect(() => {
     fetchNoteArticles();
@@ -95,11 +96,22 @@ const NoteArticles: React.FC = () => {
   };
 
   // 「東方如何月」タグでフィルタリング
-  const filteredArticles = showOnlyIkangetsu
+  let filteredArticles = showOnlyIkangetsu
     ? articles.filter(article => 
         article.categories.some(cat => cat.includes('東方如何月'))
       )
     : articles;
+
+  // 作者でフィルタリング
+  if (authorFilter.trim()) {
+    filteredArticles = filteredArticles.filter(article => {
+      const searchTerm = authorFilter.toLowerCase();
+      return (
+        (article.creatorName && article.creatorName.toLowerCase().includes(searchTerm)) ||
+        article.creator.toLowerCase().includes(searchTerm)
+      );
+    });
+  }
 
   // 日付でソート
   const sortedArticles = [...filteredArticles].sort((a, b) => {
@@ -112,6 +124,7 @@ const NoteArticles: React.FC = () => {
       return dateA.getTime() - dateB.getTime();
     }
   });
+
 
   return (
     <div className="note-articles">
@@ -126,6 +139,25 @@ const NoteArticles: React.FC = () => {
             />
             <span>「東方如何月」タグのみ表示</span>
           </label>
+          <div className="author-search">
+            <label>作者検索：</label>
+            <input
+              type="text"
+              value={authorFilter}
+              onChange={(e) => setAuthorFilter(e.target.value)}
+              placeholder="作者名で検索..."
+              className="author-input"
+            />
+            {authorFilter && (
+              <button 
+                onClick={() => setAuthorFilter('')}
+                className="clear-search"
+                title="検索をクリア"
+              >
+                ×
+              </button>
+            )}
+          </div>
           <div className="sort-controls">
             <label>並び順：</label>
             <select 
@@ -157,7 +189,9 @@ const NoteArticles: React.FC = () => {
 
       {!loading && !error && sortedArticles.length === 0 && (
         <div className="no-articles">
-          {showOnlyIkangetsu && articles.length > 0
+          {authorFilter.trim() 
+            ? `「${authorFilter}」に一致する作者の記事が見つかりませんでした。`
+            : showOnlyIkangetsu && articles.length > 0
             ? '「東方如何月」タグを含む記事が見つかりませんでした。'
             : '記事が見つかりませんでした。'}
         </div>
