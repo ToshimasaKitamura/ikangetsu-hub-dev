@@ -99,16 +99,20 @@ async function fetchNotesByHashtag(hashtag = '東方如何月', size = 10, start
   return [];
 }
 
-// 複数ページの記事を取得（ページネーション対応）
-async function fetchAllNotesByHashtag(hashtag = '東方如何月', maxArticles = 50) {
-  console.log(`🚀 ハッシュタグ「${hashtag}」から最大${maxArticles}件の記事を取得開始`);
+// 複数ページの記事を取得（ページネーション対応・全記事取得モード）
+async function fetchAllNotesByHashtag(hashtag = '東方如何月', maxArticles = 0) {
+  const isUnlimited = maxArticles === 0;
+  console.log(`🚀 ハッシュタグ「${hashtag}」から${isUnlimited ? '全て' : '最大' + maxArticles + '件'}の記事を取得開始`);
   
   let allArticles = [];
   let start = 0;
+  let pageCount = 0;
   const size = 10; // 1回のAPIコールで取得する件数
+  const maxPages = 100; // 安全上限（最大1000件まで）
   
-  while (allArticles.length < maxArticles) {
-    console.log(`📄 ページ ${Math.floor(start / size) + 1} を取得中... (${start} - ${start + size})`);
+  while (isUnlimited || allArticles.length < maxArticles) {
+    pageCount++;
+    console.log(`📄 ページ ${pageCount} を取得中... (${start} - ${start + size})`);
     
     const articles = await fetchNotesByHashtag(hashtag, size, start);
     
@@ -118,11 +122,18 @@ async function fetchAllNotesByHashtag(hashtag = '東方如何月', maxArticles =
     }
     
     allArticles = allArticles.concat(articles);
+    console.log(`📊 現在の取得済み記事数: ${allArticles.length}件`);
     
-    // 目標件数に達したら終了
-    if (allArticles.length >= maxArticles) {
+    // 制限モードで目標件数に達した場合
+    if (!isUnlimited && allArticles.length >= maxArticles) {
       allArticles = allArticles.slice(0, maxArticles);
       console.log(`🎯 目標の${maxArticles}件に達しました`);
+      break;
+    }
+    
+    // 安全上限チェック
+    if (pageCount >= maxPages) {
+      console.log(`⚠️  安全上限の${maxPages}ページ（約${maxPages * size}件）に達したため終了します`);
       break;
     }
     
@@ -146,6 +157,6 @@ async function fetchAllNotesByHashtag(hashtag = '東方如何月', maxArticles =
 
 // メイン実行
 const hashtag = process.argv[2] || '東方如何月';
-const maxArticles = parseInt(process.argv[3]) || 50;
-console.log(`📝 「${hashtag}」タグで最大${maxArticles}件の記事を取得します`);
+const maxArticles = parseInt(process.argv[3]) || 0; // デフォルト0は全記事取得
+console.log(`📝 「${hashtag}」タグで${maxArticles === 0 ? '全ての' : '最大' + maxArticles + '件の'}記事を取得します`);
 fetchAllNotesByHashtag(hashtag, maxArticles);

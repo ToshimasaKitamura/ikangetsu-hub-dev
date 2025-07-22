@@ -27,8 +27,8 @@ jobs:
       
       - name: Fetch Note Articles via API
         run: |
-          # Note非公式APIから「東方如何月」記事を取得（最大50件）
-          node scripts/fetchNoteRss.mjs 東方如何月 50
+          # Note非公式APIから「東方如何月」記事を全件取得
+          node scripts/fetchNoteRss.mjs 東方如何月
       
       - name: Check if file changed
         id: check_changes
