@@ -9,6 +9,7 @@ export interface Card {
   cardNumber: string;
   race: string;
   illustratorName: string;
+  deck_id: string;
   deck_name: string;
   remakeCardId: string | null;
   promoCardId: string | null;

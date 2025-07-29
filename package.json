@@ -5,10 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node copyAssets.mjs && tsc -b && vite build",
+    "build": "node scripts/convertHeic.mjs && node copyAssets.mjs && tsc -b && vite build",
     "start": "node copyAssets.mjs && swc src -d dist && node dist/index.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "fetch-youtube": "node scripts/fetchYouTubeData.mjs",
+    "update-youtube": "npm run fetch-youtube && npm run build",
+    "convert-heic": "node scripts/convertHeic.mjs",
+    "fetch-note": "node scripts/fetchNoteRss.mjs",
+    "update-note": "npm run fetch-note && npm run build"
   },
   "dependencies": {
     "@types/node": "^22.15.2",
@@ -20,7 +25,8 @@
     "jszip": "^3.10.1",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
@@ -34,6 +40,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "node-fetch": "^3.3.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1"

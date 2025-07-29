@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { Card } from '../../types';
+import { DeckData } from '../../utils/csvReader';
+import { getDeckImage } from '../../utils/imageLoader';
 
 interface DownloadTabProps {
   cards: Card[];
   decks: string[];
+  deckData: DeckData[];
 }
 
 function oSafeFileName(name: string) {
@@ -22,10 +25,37 @@ function chunkArray<T>(array: T[], size: number): T[][] {
   return result;
 }
 
-const DownloadTab: React.FC<DownloadTabProps> = ({ cards, decks }) => {
+const DownloadTab: React.FC<DownloadTabProps> = ({ cards, decks, deckData }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [pressed, setPressed] = useState<string | null>(null);
+  const [deckImages, setDeckImages] = useState<{ [deckName: string]: string }>({});
+
+  // デッキ画像を読み込む
+  useEffect(() => {
+    const loadDeckImages = async () => {
+      const images: { [deckName: string]: string } = {};
+      
+      for (const deck of decks) {
+        // DPLデータからデッキIDを取得（通常デッキとバリエーションデッキ両方）
+        const deckInfo = deckData.find(d => d.deck_name === deck);
+        if (deckInfo) {
+          try {
+            const imageUrl = await getDeckImage(deckInfo.id);
+            images[deck] = imageUrl;
+          } catch (error) {
+            console.log(`Failed to load image for deck: ${deck}`);
+          }
+        }
+      }
+      
+      setDeckImages(images);
+    };
+
+    if (deckData.length > 0) {
+      loadDeckImages();
+    }
+  }, [decks, deckData]);
 
   const handleDownload = async (deck: string) => {
     setIsDownloading(true);
@@ -55,7 +85,7 @@ const DownloadTab: React.FC<DownloadTabProps> = ({ cards, decks }) => {
         if (card.remakeCardId && card.id === card.remakeCardId) {
           safeName += '_remake';
         }
-        zip.file(`${safeName}.png`, blob);
+        zip.file(`${safeName}.webp`, blob);
       } catch (e) {
         // 画像取得失敗時はスキップ
       }
@@ -97,18 +127,19 @@ const DownloadTab: React.FC<DownloadTabProps> = ({ cards, decks }) => {
             {row.map(deck => {
               const isHovered = hovered === deck;
               const isPressed = pressed === deck;
+              const deckImage = deckImages[deck];
               return (
                 <div
                   key={deck}
                   style={{
-                    width: '150px',
-                    height: '150px',
+                    width: '170px',
+                    height: '210px',
                     textAlign: 'center',
-                    flex: '0 0 150px',
+                    flex: '0 0 170px',
                     marginBottom: 16,
                   }}
                 >
-                  <div style={{ width: '150px', height: '150px', textAlign: 'center', flex: '0 0 150px' }}>
+                  <div style={{ width: '170px', height: '210px', textAlign: 'center', flex: '0 0 170px' }}>
                     <button
                       onClick={() => handleDownload(deck)}
                       disabled={isDownloading}
@@ -119,23 +150,62 @@ const DownloadTab: React.FC<DownloadTabProps> = ({ cards, decks }) => {
                       style={{
                         width: '100%',
                         height: '100%',
-                        padding: '16px',
-                        background: isPressed || isHovered ? '#fff' : 'rgba(255,255,255,0.1)',
+                        padding: '8px',
+                        background: isPressed || isHovered ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.1)',
                         color: isPressed || isHovered ? '#222' : '#fff',
-                        border: 'none',
-                        borderRadius: 8,
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        borderRadius: 12,
                         cursor: 'pointer',
-                        fontSize: '1rem',
-                        fontWeight: 500,
-                        transition: 'background 0.2s, color 0.2s, box-shadow 0.2s',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                        transition: 'all 0.3s ease',
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
+                        justifyContent: 'flex-start',
                         boxSizing: 'border-box',
-                        boxShadow: isHovered || isPressed ? '0 4px 16px rgba(0,0,0,0.10)' : 'none',
+                        boxShadow: isHovered || isPressed ? '0 8px 24px rgba(0,0,0,0.20)' : '0 2px 8px rgba(0,0,0,0.10)',
+                        transform: isPressed ? 'scale(0.95)' : isHovered ? 'scale(1.05)' : 'scale(1)',
+                        backdropFilter: 'blur(10px)',
                       }}
                     >
-                      {deck}
+                      {deckImage ? (
+                        <div style={{
+                          width: '100%',
+                          height: '150px',
+                          backgroundImage: `url(${deckImage})`,
+                          backgroundSize: 'cover',
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'center 30%',
+                          borderRadius: 8,
+                          marginBottom: 8,
+                          border: '1px solid rgba(255,255,255,0.2)',
+                        }} />
+                      ) : (
+                        <div style={{
+                          width: '100%',
+                          height: '150px',
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+                          borderRadius: 8,
+                          marginBottom: 8,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '2rem',
+                          opacity: 0.7,
+                        }}>
+                          📦
+                        </div>
+                      )}
+                      <div style={{
+                        padding: '4px 8px',
+                        textAlign: 'center',
+                        lineHeight: 1.2,
+                        fontSize: typeof window !== 'undefined' && window.innerWidth <= 767 ? '0.8rem' : '0.9rem',
+                        marginTop: 'auto',
+                      }}>
+                        {deck}
+                      </div>
                     </button>
                   </div>
                 </div>

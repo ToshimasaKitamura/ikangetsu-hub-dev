@@ -18,7 +18,6 @@ const NoteArticles: React.FC = () => {
   const [articles, setArticles] = useState<NoteArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showOnlyIkangetsu, setShowOnlyIkangetsu] = useState(true);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [authorFilter, setAuthorFilter] = useState<string>('all');
 
@@ -95,12 +94,8 @@ const NoteArticles: React.FC = () => {
     }
   };
 
-  // 「東方如何月」タグでフィルタリング
-  let filteredArticles = showOnlyIkangetsu
-    ? articles.filter(article => 
-        article.categories.some(cat => cat.includes('東方如何月'))
-      )
-    : articles;
+  // フィルタリング開始（全記事から）
+  let filteredArticles = articles;
 
   // 作者でフィルタリング
   if (authorFilter && authorFilter !== 'all') {
@@ -138,14 +133,6 @@ const NoteArticles: React.FC = () => {
       <div className="note-header">
         <h2>Note記事一覧</h2>
         <div className="note-controls">
-          <label className="filter-toggle">
-            <input
-              type="checkbox"
-              checked={showOnlyIkangetsu}
-              onChange={(e) => setShowOnlyIkangetsu(e.target.checked)}
-            />
-            <span>「東方如何月」タグのみ表示</span>
-          </label>
           <div className="author-filter">
             <label>作者：</label>
             <select 
@@ -194,8 +181,6 @@ const NoteArticles: React.FC = () => {
         <div className="no-articles">
           {authorFilter !== 'all'
             ? `選択した作者の記事が見つかりませんでした。`
-            : showOnlyIkangetsu && articles.length > 0
-            ? '「東方如何月」タグを含む記事が見つかりませんでした。'
             : '記事が見つかりませんでした。'}
         </div>
       )}

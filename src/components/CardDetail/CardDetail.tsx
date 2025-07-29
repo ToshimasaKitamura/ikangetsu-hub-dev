@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCardImage } from '../../utils/imageLoader';
+import { getCardImage, downloadImageAsPNG } from '../../utils/imageLoader';
 import { Card } from '../../types';
 
 // 画面幅でCSSを切り替え
@@ -91,9 +91,33 @@ const CardDetail: React.FC<CardDetailProps> = ({ card, onClose, pclData, illustr
 
   const pfcCardName = isPfcCardVisible && pfcCardImage ? pclData.find(pfc => pfc.id === card.pfcCardId)?.card_name || card.name : card.name;
 
+  const handleDownload = async () => {
+    const currentImage = isRemakeCardVisible ? (remakeCardImage || card.image) :
+                         isPromoCardVisible ? (promoCardImage || card.image) :
+                         isSpcCardVisible ? (spcCardImage || card.image) :
+                         isCpcCardVisible ? (cpcCardImage || card.image) :
+                         isPfcCardVisible ? (pfcCardImage || card.image) :
+                         card.image;
+    
+    const cardName = isPromoCardVisible ? promoCardName
+                    : isSpcCardVisible ? spcCardName
+                    : isCpcCardVisible ? cpcCardName
+                    : isPfcCardVisible ? pfcCardName
+                    : card.name;
+    
+    const filename = `${cardName.replace(/[^a-zA-Z0-9]/g, '_')}.webp`;
+    
+    try {
+      await downloadImageAsPNG(currentImage, filename);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  };
+
   return (
     <div className="card-detail">
       <button className="close-button" onClick={onClose}>×</button>
+      <button className="download-button" onClick={handleDownload} title="Download as PNG">⬇</button>
       <div className="main-content">
         <div className="card-content">
           <img className={`main-image ${isRemakeCardVisible || isPromoCardVisible || isSpcCardVisible || isCpcCardVisible || isPfcCardVisible ? 'bounce' : ''}`} 

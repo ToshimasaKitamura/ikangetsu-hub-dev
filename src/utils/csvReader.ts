@@ -9,13 +9,51 @@ interface CardData {
   race: string;
   card_text: string;
   illustrator_id: string;
-  deck_name: string;
+  deck_id: string;
   fc2wiki_link: string;
+}
+
+export interface DeckData {
+  id: string;
+  deck_name: string;
+}
+
+export interface YouTubeVideoData {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  publishedAt: string;
+  duration: string;
+  viewCount: string;
 }
 
 export interface IllustratorData {
   id: string;
   name: string;
+}
+
+export function readDplCsv(): Promise<DeckData[]> {
+  const csvPath = import.meta.env.BASE_URL + '/db/DPL.csv';
+  return fetch(csvPath)
+    .then(response => response.text())
+    .then(csvText => {
+      const result = Papa.parse<DeckData>(csvText, {
+        header: false,
+        skipEmptyLines: true,
+        delimiter: ','
+      });
+      return result.data
+        .slice(1)
+        .map((record: any) => {
+          const deck = {
+            id: record[0]?.trim() || '',
+            deck_name: record[1]?.trim() || ''
+          };
+          return deck;
+        })
+        .filter(deck => deck.id !== '');
+    });
 }
 
 export function readIrlCsv(): Promise<IllustratorData[]> {
@@ -65,7 +103,7 @@ export function readNclCsv(): Promise<CardData[]> {
             race: record[5]?.trim() || '',
             card_text: record[6]?.trim() || '',
             illustrator_id: record[7]?.trim() || '',
-            deck_name: record[8]?.trim() || '',
+            deck_id: record[8]?.trim() || '',
             fc2wiki_link: record[9]?.trim() || ''
           };
           return card;
@@ -206,7 +244,7 @@ export async function readPfcCsv(): Promise<{ id: string; card_name: string; cha
 
 export const readSclCsv = async (): Promise<{ id: string; card_name: string; characters: string; normal_card_id: string }[]> => {
   try {
-    const response = await fetch(import.meta.env.BASE_URL + '/data/scl.csv');
+    const response = await fetch(import.meta.env.BASE_URL + '/db/scl.csv');
     const csvText = await response.text();
     const rows = csvText.split('\n').slice(1); // ヘッダー行をスキップ
     return rows
@@ -219,6 +257,34 @@ export const readSclCsv = async (): Promise<{ id: string; card_name: string; cha
     return [];
   }
 };
+
+export function readYtlCsv(): Promise<YouTubeVideoData[]> {
+  const csvPath = import.meta.env.BASE_URL + '/db/YTL.csv';
+  return fetch(csvPath)
+    .then(response => response.text())
+    .then(csvText => {
+      const result = Papa.parse<YouTubeVideoData>(csvText, {
+        header: false,
+        skipEmptyLines: true,
+        delimiter: ','
+      });
+      return result.data
+        .slice(1)
+        .map((record: any) => {
+          const video = {
+            id: record[0]?.trim() || '',
+            title: record[1]?.trim() || '',
+            description: record[2]?.trim() || '',
+            thumbnail: record[3]?.trim() || '',
+            publishedAt: record[4]?.trim() || '',
+            duration: record[5]?.trim() || '',
+            viewCount: record[6]?.trim() || ''
+          };
+          return video;
+        })
+        .filter(video => video.id !== '');
+    });
+}
 
 declare module 'papaparse' {
   export function parse(input: string, config?: any): any;

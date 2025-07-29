@@ -1,0 +1,56 @@
+name: Update Note Articles
+
+on:
+  schedule:
+    # 毎日日本時間の午前9時に実行（UTC 0:00）
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 手動実行も可能にする
+
+jobs:
+  update-note:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Fetch Note articles
+      run: npm run fetch-note
+      continue-on-error: true
+
+    - name: Check if there are changes
+      id: verify-changed-files
+      run: |
+        git diff --exit-code public/note-articles.json || echo "changed=true" >> $GITHUB_OUTPUT
+
+    - name: Commit and push if changed
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add public/note-articles.json
+        git commit -m "🔄 Update Note articles [skip ci]"
+        git push
+
+    - name: Build project
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: npm run build
+
+    - name: Deploy to GitHub Pages
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        # cname: your-domain.com # もしカスタムドメインを使用している場合はコメントを外して設定

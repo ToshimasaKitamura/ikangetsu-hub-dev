@@ -60,6 +60,18 @@ async function fetchNotesByHashtag(hashtag = '東方如何月', size = 10, start
           // 公開日の変換
           const pubDate = new Date(note.publish_at).toISOString();
 
+          // ハッシュタグの取得（記事のタグリストから）
+          const categories = [];
+          if (note.hashtags && Array.isArray(note.hashtags)) {
+            categories.push(...note.hashtags.map(tag => tag.name || tag));
+          } else if (note.tags && Array.isArray(note.tags)) {
+            categories.push(...note.tags.map(tag => tag.name || tag));
+          }
+          // ハッシュタグが見つからない場合は検索キーワードを追加
+          if (categories.length === 0) {
+            categories.push(hashtag);
+          }
+
           return {
             title: note.name || 'タイトルなし',
             link: `https://note.com/${note.user?.urlname || 'unknown'}/n/${note.key}`,
@@ -68,7 +80,7 @@ async function fetchNotesByHashtag(hashtag = '東方如何月', size = 10, start
             creatorName: note.user?.nickname || '不明',
             thumbnail: thumbnail,
             description: note.description ? note.description.substring(0, 200) + '...' : '',
-            categories: [hashtag],
+            categories: categories,
             likeCount: note.likeCount || 0,
             commentCount: note.commentCount || 0,
             noteKey: note.key
@@ -104,9 +116,26 @@ async function fetchAllNotesByHashtag(hashtag = '東方如何月', maxArticles =
   const isUnlimited = maxArticles === 0;
   console.log(`🚀 ハッシュタグ「${hashtag}」から${isUnlimited ? '全て' : '最大' + maxArticles + '件'}の記事を取得開始`);
   
+  // 既存の記事を読み込む
+  const outputPath = path.join(__dirname, '../public/note-articles.json');
+  let existingArticles = [];
+  let existingKeys = new Set();
+  
+  try {
+    if (fs.existsSync(outputPath)) {
+      const data = fs.readFileSync(outputPath, 'utf-8');
+      existingArticles = JSON.parse(data);
+      existingKeys = new Set(existingArticles.map(article => article.noteKey));
+      console.log(`📚 既存の記事${existingArticles.length}件を読み込みました`);
+    }
+  } catch (error) {
+    console.warn('⚠️  既存の記事の読み込みに失敗しました:', error.message);
+  }
+  
   let allArticles = [];
   let start = 0;
   let pageCount = 0;
+  let newArticlesCount = 0;
   const size = 10; // 1回のAPIコールで取得する件数
   const maxPages = 100; // 安全上限（最大1000件まで）
   
@@ -121,8 +150,12 @@ async function fetchAllNotesByHashtag(hashtag = '東方如何月', maxArticles =
       break;
     }
     
+    // 新しい記事のみをカウントして追加
+    const newArticles = articles.filter(article => !existingKeys.has(article.noteKey));
+    newArticlesCount += newArticles.length;
+    
     allArticles = allArticles.concat(articles);
-    console.log(`📊 現在の取得済み記事数: ${allArticles.length}件`);
+    console.log(`📊 現在の取得済み記事数: ${allArticles.length}件 (新規: ${newArticlesCount}件)`);
     
     // 制限モードで目標件数に達した場合
     if (!isUnlimited && allArticles.length >= maxArticles) {
@@ -144,15 +177,22 @@ async function fetchAllNotesByHashtag(hashtag = '東方如何月', maxArticles =
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
 
+  // 既存の記事とマージ（重複を排除）
+  const mergedArticles = [...allArticles];
+  existingArticles.forEach(existingArticle => {
+    if (!allArticles.find(article => article.noteKey === existingArticle.noteKey)) {
+      mergedArticles.push(existingArticle);
+    }
+  });
+
   // 日付順でソート（新しい順）
-  allArticles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  mergedArticles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
   // JSONファイルとして保存
-  const outputPath = path.join(__dirname, '../public/note-articles.json');
-  fs.writeFileSync(outputPath, JSON.stringify(allArticles, null, 2));
+  fs.writeFileSync(outputPath, JSON.stringify(mergedArticles, null, 2));
   
-  console.log(`💾 合計${allArticles.length}件の記事を保存しました: ${outputPath}`);
-  return allArticles;
+  console.log(`💾 合計${mergedArticles.length}件の記事を保存しました (新規: ${newArticlesCount}件): ${outputPath}`);
+  return mergedArticles;
 }
 
 // メイン実行

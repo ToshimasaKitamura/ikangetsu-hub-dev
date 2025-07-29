@@ -1,0 +1,60 @@
+[
+  {
+    "id": "1",
+    "title": "東方如何月 3on3大会 開催レポート",
+    "date": "2024-07-21",
+    "author": "運営チーム",
+    "content": "東方如何月初の3on3形式の大会が開催されました！\n\n今回は3人1組のチーム戦という新しい形式での開催となり、チームワークと戦略性が問われる熱い戦いが繰り広げられました。\n\n参加チームは8チーム、総勢24名のプレイヤーが集まり、予選リーグから決勝トーナメントまで、白熱した試合が続きました。\n\n各チームが持ち寄った異なるデッキの組み合わせや、チーム内での連携プレイなど、個人戦とは違った魅力が満載の大会となりました。\n\n優勝チームには特製のチームトロフィーが贈呈され、MVPプレイヤーには特別なプロモカードが授与されました。\n\n次回の3on3大会も計画中ですので、ぜひチームを組んでご参加ください！",
+    "tags": ["大会", "レポート", "3on3", "チーム戦"],
+    "imageUrl": "./tournament/如何月3on3/IMG_6445.jpg",
+    "tournamentFolder": "如何月3on3",
+    "images": [
+      "./tournament/如何月3on3/IMG_6445.jpg",
+      "./tournament/如何月3on3/IMG_6446.jpg",
+      "./tournament/如何月3on3/IMG_6447.jpg",
+      "./tournament/如何月3on3/IMG_6453.jpg",
+      "./tournament/如何月3on3/IMG_6454.jpg"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "3on3大会 決勝戦ハイライト",
+    "date": "2024-07-21",
+    "author": "解説班",
+    "content": "決勝戦は「チーム紅魔館」vs「チーム永遠亭」の対戦となりました。\n\n第1試合では、紅魔館の速攻デッキが永遠亭の防御を突破し、先制点を獲得。\n第2試合は永遠亭のコントロールデッキが場を支配し、1-1のタイに。\n運命の第3試合は、両チームのエースが激突！\n\n最終的に、チーム紅魔館が2-1で優勝を決めました。\n\n特に印象的だったのは、決勝第3試合での神プレイの数々。\n両チームとも最後まで諦めない素晴らしい試合を見せてくれました。",
+    "tags": ["大会", "ハイライト", "決勝戦", "3on3"],
+    "imageUrl": "./tournament/如何月3on3/IMG_6448.jpg",
+    "tournamentFolder": "如何月3on3",
+    "images": [
+      "./tournament/如何月3on3/IMG_6448.jpg",
+      "./tournament/如何月3on3/IMG_6449.jpg",
+      "./tournament/如何月3on3/IMG_6450.jpg",
+      "./tournament/如何月3on3/IMG_6451.jpg",
+      "./tournament/如何月3on3/IMG_6455.jpg",
+      "./tournament/如何月3on3/IMG_6456.jpg",
+      "./tournament/如何月3on3/IMG_6457.jpg"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "3on3大会 参加者インタビュー",
+    "date": "2024-07-22",
+    "author": "広報担当",
+    "content": "大会終了後、参加者の皆さんにインタビューを行いました。\n\n「チーム戦は個人戦とは違った楽しさがある」\n「仲間と相談しながらデッキを組むのが面白かった」\n「次回はもっと連携を意識したい」\n\nなど、多くの感想をいただきました。\n\nまた、初心者の方からも「チームメイトがサポートしてくれて安心して参加できた」という声があり、\n3on3形式が新規プレイヤーにも優しい大会形式であることが分かりました。",
+    "tags": ["大会", "インタビュー", "3on3", "感想"],
+    "imageUrl": "./tournament/如何月3on3/IMG_6458.jpg",
+    "tournamentFolder": "如何月3on3",
+    "images": [
+      "./tournament/如何月3on3/IMG_6458.jpg",
+      "./tournament/如何月3on3/IMG_6459.jpg",
+      "./tournament/如何月3on3/IMG_6460.jpg",
+      "./tournament/如何月3on3/IMG_6461.jpg",
+      "./tournament/如何月3on3/IMG_6462.jpg",
+      "./tournament/如何月3on3/IMG_6463.jpg",
+      "./tournament/如何月3on3/IMG_6464.jpg",
+      "./tournament/如何月3on3/IMG_6465.jpg",
+      "./tournament/如何月3on3/IMG_6466.jpg",
+      "./tournament/如何月3on3/IMG_6467.jpg"
+    ]
+  }
+]

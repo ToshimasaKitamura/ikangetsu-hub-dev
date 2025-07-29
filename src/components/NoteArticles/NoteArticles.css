@@ -129,20 +129,6 @@
   font-size: 14px;
 }
 
-.filter-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #ccc;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.filter-toggle input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
 
 .sort-controls {
   display: flex;
