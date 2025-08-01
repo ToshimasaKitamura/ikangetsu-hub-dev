@@ -1,0 +1,49 @@
+name: Fetch Note RSS
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # 6時間ごとに実行
+  workflow_dispatch:  # 手動実行も可能
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/fetchNoteRss.mjs'
+
+jobs:
+  fetch-rss:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: |
+          npm install node-fetch
+      
+      - name: Fetch Note Articles via API
+        run: |
+          # Note非公式APIから「東方如何月」記事を全件取得
+          node scripts/fetchNoteRss.mjs 東方如何月
+      
+      - name: Check if file changed
+        id: check_changes
+        run: |
+          if git diff --quiet public/note-articles.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push if changed
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add public/note-articles.json
+          git commit -m "Update Note articles [skip ci]"
+          git push
