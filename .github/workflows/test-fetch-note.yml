@@ -1,0 +1,56 @@
+name: Test Note Fetch
+
+on:
+  workflow_dispatch:
+    inputs:
+      hashtag:
+        description: 'Note hashtag to search'
+        required: false
+        default: '東方如何月'
+      max_articles:
+        description: 'Maximum number of articles (0 for all)'
+        required: false
+        default: '10'
+
+jobs:
+  test-fetch:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Test fetch Note articles
+        run: |
+          echo "Fetching articles with hashtag: ${{ github.event.inputs.hashtag }}"
+          echo "Maximum articles: ${{ github.event.inputs.max_articles }}"
+          node scripts/fetchNoteRss.mjs "${{ github.event.inputs.hashtag }}" "${{ github.event.inputs.max_articles }}"
+      
+      - name: Display fetched articles info
+        run: |
+          if [ -f public/note-articles.json ]; then
+            echo "Articles fetched successfully!"
+            echo "Total articles count:"
+            jq '. | length' public/note-articles.json
+            echo ""
+            echo "First 3 articles:"
+            jq '.[0:3] | .[] | {title: .title, creator: .creatorName, date: .pubDate}' public/note-articles.json
+          else
+            echo "No articles file found"
+          fi
+      
+      - name: Upload fetched articles as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: note-articles-test
+          path: public/note-articles.json
+          if-no-files-found: warn
